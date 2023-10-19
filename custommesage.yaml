@@ -1,0 +1,10 @@
+---
+- hosts: Linux
+  tasks:
+  - name: print the file content
+    command: cat training
+    register: filecontent
+  - debug: msg="File is empty"
+    when: filecontent.stdout==""
+  - debug: msg="File is intresting"
+    when: filecontent.stdout!=""

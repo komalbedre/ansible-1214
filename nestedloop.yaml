@@ -1,0 +1,12 @@
+---
+- hosts: Linux
+  tasks:
+  - name: print nested loop variables
+    shell:
+      echo "{{ item[0] }} cloud is {{ item[1] }} and {{ item[2] }} to use"
+    with_nested:
+    - ['aws', 'azure', 'gcp']
+    - ['costly', 'cheapest', 'cheap']
+    - ['easiest', 'easier', 'easy']
+    register: output
+  - debug: msg="{{ output.stdout }}"

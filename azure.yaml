@@ -1,0 +1,67 @@
+---
+- hosts: localhost
+  tasks:
+  - name: Create a resource group
+    azure.azcollection.azure_rm_resourcegroup:
+      name: ansible-lab-user6
+      location: East US
+    register: rg
+
+  - name: Create virtual network
+    azure_rm_virtualnetwork:
+      name: ansible-lab-user6vnet
+      resource_group: ansible-lab-user6
+      address_prefixes_cidr: 10.0.0.0/16
+    register: vnet
+
+  - name: Create subnet
+    azure_rm_subnet:
+      name: ansible-lab-user6subnet
+      resource_group: ansible-lab-user6
+      virtual_network_name: ansible-lab-user6vnet
+      address_prefixes: "10.0.0.0/24"
+
+  - name: Create Public IP address
+    azure_rm_publicipaddress:
+      name: ansible-lab-user6publicip
+      resource_group: ansible-lab-user6
+      allocation_method: Dynamic
+
+  - name: Create network unterface
+    azure_rm_networkinterface:
+      name: ansible-lab-user6nic
+      resource_group: ansible-lab-user6
+      location: East US
+      virtual_network_name: ansible-lab-user6vnet
+      subnet_name: ansible-lab-user6subnet
+      public_ip_name: ansible-lab-user6publicip
+
+  - name: Create a network security group
+    azure_rm_securitygroup:
+      name: ansible-lab-user6nsg
+      resource_group: ansible-lab-user6
+      rules:
+        - name: SSH
+          access: Allow
+          direction: Inbound
+          priority: 100
+          protocol: Tcp
+          source_port_range: "*"
+          source_address_prefix: "*"
+          destination_port_range: 22
+          destination_address_prefix: "*"
+
+  - name: Create virtual machine
+    azure_rm_virtualmachine:
+      name: ansible-lab-user6vm
+      resource_group: ansible-lab-user6
+      location: East US
+      vm_size: Standard_D2s_v3
+      admin_username: ansible-lab-user6
+      admin_password: TrainerP@ssw0rd
+      image:
+        offer: UbuntuServer
+        publisher: Canonical
+        sku: 18.04-LTS
+        version: 18.04.201804262
+      network_interfaces: ansible-lab-user6nic
