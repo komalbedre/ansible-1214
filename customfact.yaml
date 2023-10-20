@@ -12,7 +12,7 @@
       src: datetime.sh
       dest: /etc/ansible/facts.d/date_time.fact
       mode: 0755
-  - name: reload the fact
+  - name: reload the facts
     setup:
       filter: ansible_local
   - name: print the custom facts
